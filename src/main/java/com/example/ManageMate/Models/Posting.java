@@ -36,4 +36,11 @@ public class Posting {
 
     @Embedded
     private Role experience;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.numberOfApplicants == null) {
+            this.numberOfApplicants = 0L; // Default value set to 0
+        }
+    }
 }
