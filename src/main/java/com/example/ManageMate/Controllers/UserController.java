@@ -1,11 +1,11 @@
 package com.example.ManageMate.Controllers;
 
+import com.example.ManageMate.DTO.User.AuthResponse;
 import com.example.ManageMate.DTO.User.LoginDetails;
 import com.example.ManageMate.DTO.User.RegisterUser;
 import com.example.ManageMate.DTO.User.UserSession;
 import com.example.ManageMate.Models.User;
 import com.example.ManageMate.Services.UserServiceInterface;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,23 +13,27 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 
 @RestController
-@RequestMapping(path = "/api/user")
+@RequestMapping(path = "/api/auth")
 public class UserController {
 
-    @Autowired
-    private UserServiceInterface userService;
+    private final UserServiceInterface userService;
+
+    public UserController(UserServiceInterface userService) {
+        this.userService = userService;
+    }
 
     @PostMapping(path = "/signup")
-    public String signupHelper(@RequestBody RegisterUser registerUser) {
-        return userService.registerUser(registerUser);
+    public ResponseEntity<AuthResponse> signupHelper(@RequestBody RegisterUser registerUser) {
+        return new ResponseEntity<>(userService.registerUser(registerUser),HttpStatus.OK);
     }
 
     @PostMapping(path = "/login")
-    public ResponseEntity<UserSession> loginHelper(@RequestBody LoginDetails loginDetails){
-        UserSession currUserSession= userService.loginUser(loginDetails);
+    public ResponseEntity<AuthResponse> loginHelper(@RequestBody LoginDetails loginDetails){
+        AuthResponse currUserSession= userService.loginUser(loginDetails);
         return new ResponseEntity<>(currUserSession, HttpStatus.OK);
     }
 
+    
     @GetMapping(path = "/getAllUsers")
     public ArrayList<User> getAUsers(){
         return userService.getAllUsers();
