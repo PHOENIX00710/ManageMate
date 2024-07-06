@@ -1,8 +1,10 @@
 package com.example.ManageMate.Services;
 
-import com.example.ManageMate.DTO.ApplicationDTO;
+import com.example.ManageMate.DTO.Application.ApplicationRequest;
+import com.example.ManageMate.DTO.Response;
 import org.springframework.http.ResponseEntity;
 
 public interface ApplicationService {
-    ResponseEntity<String> submitApplication(ApplicationDTO applicationDTO, Long userId, Long postId);
+    ResponseEntity<Response> submitApplication(ApplicationRequest applicationRequest, Long userId, Long postId);
+    ResponseEntity<Response> getAllApplications();
 }

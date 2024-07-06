@@ -1,5 +1,8 @@
-package com.example.ManageMate.Models;
+package com.example.ManageMate.Models.Application;
 
+import com.example.ManageMate.DTO.Profile.ProfileResponse;
+import com.example.ManageMate.Models.Posting.Posting;
+import com.example.ManageMate.Models.User.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

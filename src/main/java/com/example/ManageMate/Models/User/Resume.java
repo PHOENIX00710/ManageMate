@@ -1,4 +1,4 @@
-package com.example.ManageMate.Models;
+package com.example.ManageMate.Models.User;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,6 +19,7 @@ public class Resume {
     private String fileName;
 
     @Lob
+    @Column(columnDefinition = "LONGBLOB")
     private byte[] data;
 
 }

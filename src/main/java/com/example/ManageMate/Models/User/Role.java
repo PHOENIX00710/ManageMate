@@ -1,4 +1,4 @@
-package com.example.ManageMate.Models;
+package com.example.ManageMate.Models.User;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;

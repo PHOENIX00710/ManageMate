@@ -1,6 +1,6 @@
-package com.example.ManageMate.DTO;
+package com.example.ManageMate.DTO.Posting;
 
-import com.example.ManageMate.Models.Role;
+import com.example.ManageMate.Models.User.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostingDTO {
+public class PostingRequest {
 
         @Lob
         private String description;

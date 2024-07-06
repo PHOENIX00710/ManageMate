@@ -1,6 +1,6 @@
 package com.example.ManageMate.Repositories;
 
-import com.example.ManageMate.Models.User;
+import com.example.ManageMate.Models.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

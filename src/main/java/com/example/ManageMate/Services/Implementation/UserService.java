@@ -1,21 +1,30 @@
 package com.example.ManageMate.Services.Implementation;
 
+import com.example.ManageMate.DTO.Profile.ProfileRequest;
+import com.example.ManageMate.DTO.Profile.ProfileResponse;
+import com.example.ManageMate.DTO.Response;
 import com.example.ManageMate.DTO.User.AuthResponse;
 import com.example.ManageMate.DTO.User.LoginDetails;
 import com.example.ManageMate.DTO.User.RegisterUser;
-import com.example.ManageMate.DTO.User.UserSession;
 import com.example.ManageMate.Exceptions.CustomError;
-import com.example.ManageMate.Models.User;
-import com.example.ManageMate.Models.UserRole;
+import com.example.ManageMate.Models.User.Resume;
+import com.example.ManageMate.Models.User.User;
+import com.example.ManageMate.Models.User.Auth.UserRole;
 import com.example.ManageMate.Repositories.UserRepository;
+import com.example.ManageMate.Services.ResumeService;
 import com.example.ManageMate.Services.UserServiceInterface;
 import com.example.ManageMate.auth.service.JwtService;
+import com.example.ManageMate.utils.UserToProfileResponse;
+import org.modelmapper.ModelMapper;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 @Service
@@ -25,17 +34,24 @@ public class UserService implements UserServiceInterface {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final ModelMapper modelMapper;
+    final private UserToProfileResponse toProfileResponse;
+    private final ResumeService resumeService;
 
     public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository,
-                          JwtService jwtService,
-                          AuthenticationManager authenticationManager) {
+                       JwtService jwtService,
+                       AuthenticationManager authenticationManager, ModelMapper modelMapper, UserToProfileResponse toProfileResponse, ResumeService resumeService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.modelMapper = modelMapper;
+        this.toProfileResponse = toProfileResponse;
+        this.resumeService = resumeService;
     }
 
     //Signup
+    @Override
     public AuthResponse registerUser(RegisterUser registerUser){
 
         var user = User.builder()
@@ -55,6 +71,8 @@ public class UserService implements UserServiceInterface {
 
     }
 
+    //Login
+    @Override
     public AuthResponse loginUser(LoginDetails loginDetails){
 
         authenticationManager.authenticate(
@@ -75,7 +93,55 @@ public class UserService implements UserServiceInterface {
     }
 
     // Get all Users
+    @PreAuthorize("has('ADMIN')")
+    @Override
     public ArrayList<User> getAllUsers(){
         return new ArrayList<>(userRepository.findAll());
+    }
+
+
+    @Override
+    public Response updateProfile(ProfileRequest profileRequest, Long userId) throws IOException {
+
+        if(profileRequest.getPhone() == null || profileRequest.getPhone().isEmpty()){
+            throw new CustomError("Phone Number field cannot be empty","INPUT_ERROR");
+        }
+        if(profileRequest.getName() == null || profileRequest.getName().isEmpty()){
+            throw new CustomError("Name field cannot be empty","INPUT_ERROR");
+        }
+
+        User currUser=userRepository.findById(userId).orElseThrow(
+                ()->new CustomError("User Not Found","NOT_FOUND")
+        );
+
+        currUser.setName(profileRequest.getName());
+        currUser.setPhone(profileRequest.getPhone());
+
+        // Additional fields, if they are part of the request and user model
+        if (profileRequest.getResume() != null && !profileRequest.getResume().isEmpty()) {
+            Response response=resumeService.saveFile(profileRequest.getResume());
+            currUser.setResumeFile((Resume) response.getObj());
+        }
+        if (profileRequest.getProfilePicture() != null && !profileRequest.getProfilePicture().isEmpty()) {
+
+        }
+        if (profileRequest.getLocations() != null) {
+            currUser.setLocations(profileRequest.getLocations());
+        }
+        if (profileRequest.getPreferredRoles() != null) {
+            currUser.setPreferredRoles(profileRequest.getPreferredRoles());
+        }
+
+        try{
+            userRepository.save(currUser);
+
+            ProfileResponse profileResponse=toProfileResponse.convertToProfile(currUser);
+
+            return new Response(true, "Profile Successfully Updated", profileResponse);
+        }
+        catch (Exception e){
+            throw new CustomError("Error in saving updates","INTERNAL_SERVER_ERROR");
+        }
+
     }
 }

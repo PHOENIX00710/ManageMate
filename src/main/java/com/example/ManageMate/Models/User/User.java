@@ -1,5 +1,6 @@
-package com.example.ManageMate.Models;
+package com.example.ManageMate.Models.User;
 
+import com.example.ManageMate.Models.User.Auth.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
