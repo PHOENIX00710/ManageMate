@@ -27,9 +27,11 @@ public class Application {
     private Posting posting;
 
     @Lob
+    @Column(columnDefinition = "LONGBLOB")
     private String coverLetter;
 
     @Lob
+    @Column(columnDefinition = "LONGBLOB")
     private String joiningReason;
 
 }

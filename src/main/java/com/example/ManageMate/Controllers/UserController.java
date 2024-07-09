@@ -6,11 +6,8 @@ import com.example.ManageMate.DTO.Response;
 import com.example.ManageMate.DTO.User.AuthResponse;
 import com.example.ManageMate.DTO.User.LoginDetails;
 import com.example.ManageMate.DTO.User.RegisterUser;
-import com.example.ManageMate.Models.User.User;
 import com.example.ManageMate.Services.UserServiceInterface;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,8 +36,14 @@ public class UserController {
     }
 
     @GetMapping(path = "/getAllUsers")
-    public ArrayList<User> getAUsers(){
-        return userService.getAllUsers();
+    public ResponseEntity<ArrayList<Response>> getUsers(){
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @GetMapping(path = "/getUserById")
+    public ResponseEntity<Response> getProfile(@PathVariable Long userId){
+        return ResponseEntity.ok(new Response(true,"The profile details are as follows",
+                userService.getProfileById(userId)));
     }
 
     @PostMapping(path = "/updateProfile/{userId}")
@@ -48,14 +51,14 @@ public class UserController {
                                                   @PathVariable Long userId) throws IOException {
         ProfileResponse profileResponse = (ProfileResponse) userService.updateProfile(profileRequest,userId).getObj();
 
-        // Optionally set headers if needed, e.g., content type for BLOB data
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF); // Set content type as per your data type
+//        // Optionally set headers if needed, e.g., content type for BLOB data
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_PDF); // Set content type as per your data type
+//
+//        // Set appropriate filename for download if needed
+//        headers.setContentDispositionFormData("inline", "resume.pdf");
 
-        // Set appropriate filename for download if needed
-        headers.setContentDispositionFormData("inline", "resume.pdf");
-
-        return new ResponseEntity<>(profileResponse, headers, HttpStatus.OK);
+        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
 
     }
 

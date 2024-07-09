@@ -17,11 +17,14 @@ import java.util.List;
 @Service
 public class PostingServiceImpl implements com.example.ManageMate.Services.PostingService {
 
-    @Autowired
-    PostingRepository postingRepository;
 
-    @Autowired
-    ModelMapper modelMapper;
+    private final PostingRepository postingRepository;
+    private final ModelMapper modelMapper;
+
+    public PostingServiceImpl(PostingRepository postingRepository, ModelMapper modelMapper) {
+        this.postingRepository = postingRepository;
+        this.modelMapper = modelMapper;
+    }
 
 
     @Override
@@ -46,5 +49,15 @@ public class PostingServiceImpl implements com.example.ManageMate.Services.Posti
             responses.add(temp);
         }
         return ResponseEntity.ok(responses);
+    }
+
+    @Override
+    public void deletePost(Long postId) {
+        try{
+            postingRepository.deleteById(postId);
+        }
+        catch (Exception e){
+            throw new CustomError("Error in Deletion","INTERNAL_SERVER_ERROR");
+        }
     }
 }

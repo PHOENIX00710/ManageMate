@@ -19,6 +19,7 @@ public class Image {
     private String fileName;
 
     @Lob
+    @Column(columnDefinition = "LONGBLOB")
     private byte[] data;
 
 }

@@ -7,10 +7,12 @@ import com.example.ManageMate.DTO.User.AuthResponse;
 import com.example.ManageMate.DTO.User.LoginDetails;
 import com.example.ManageMate.DTO.User.RegisterUser;
 import com.example.ManageMate.Exceptions.CustomError;
+import com.example.ManageMate.Models.User.Image;
 import com.example.ManageMate.Models.User.Resume;
 import com.example.ManageMate.Models.User.User;
 import com.example.ManageMate.Models.User.Auth.UserRole;
 import com.example.ManageMate.Repositories.UserRepository;
+import com.example.ManageMate.Services.ProfilePictureService;
 import com.example.ManageMate.Services.ResumeService;
 import com.example.ManageMate.Services.UserServiceInterface;
 import com.example.ManageMate.auth.service.JwtService;
@@ -34,18 +36,18 @@ public class UserService implements UserServiceInterface {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final ModelMapper modelMapper;
+    private final ProfilePictureService profilePictureService;
     final private UserToProfileResponse toProfileResponse;
     private final ResumeService resumeService;
 
     public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository,
                        JwtService jwtService,
-                       AuthenticationManager authenticationManager, ModelMapper modelMapper, UserToProfileResponse toProfileResponse, ResumeService resumeService) {
+                       AuthenticationManager authenticationManager, ModelMapper modelMapper, ProfilePictureService profilePictureService, UserToProfileResponse toProfileResponse, ResumeService resumeService) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
-        this.modelMapper = modelMapper;
+        this.profilePictureService = profilePictureService;
         this.toProfileResponse = toProfileResponse;
         this.resumeService = resumeService;
     }
@@ -93,10 +95,22 @@ public class UserService implements UserServiceInterface {
     }
 
     // Get all Users
-    @PreAuthorize("has('ADMIN')")
+//    @PreAuthorize("has('ADMIN')")
     @Override
-    public ArrayList<User> getAllUsers(){
-        return new ArrayList<>(userRepository.findAll());
+    public ArrayList<Response> getAllUsers(){
+        System.out.println("Hello i am in service layer");
+        try{
+            ArrayList<User> users= new ArrayList<>(userRepository.findAll());
+            ArrayList<Response> responses=new ArrayList<>();
+            for(User currUser:users){
+                ProfileResponse profileResponse=toProfileResponse.convertToProfile(currUser);
+                responses.add(new Response(true,"User details: "+users.indexOf(currUser),profileResponse));
+            }
+            return responses;
+        }
+        catch (Exception e){
+            throw new CustomError("Profile details couldn't be fetched","INTERNAL_SERVER_ERROR");
+        }
     }
 
 
@@ -123,7 +137,8 @@ public class UserService implements UserServiceInterface {
             currUser.setResumeFile((Resume) response.getObj());
         }
         if (profileRequest.getProfilePicture() != null && !profileRequest.getProfilePicture().isEmpty()) {
-
+            Response profilePicture=profilePictureService.savePicture(profileRequest.getProfilePicture());
+            currUser.setImageFile((Image) profilePicture.getObj());
         }
         if (profileRequest.getLocations() != null) {
             currUser.setLocations(profileRequest.getLocations());
@@ -143,5 +158,14 @@ public class UserService implements UserServiceInterface {
             throw new CustomError("Error in saving updates","INTERNAL_SERVER_ERROR");
         }
 
+    }
+
+    @Override
+    public ProfileResponse getProfileById(Long Id) {
+        User currUser=userRepository.findById(Id).orElseThrow(
+                ()->new CustomError("User Not Found","NOT_FOUND")
+        );
+
+        return toProfileResponse.convertToProfile(currUser);
     }
 }
