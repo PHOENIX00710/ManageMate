@@ -1,17 +1,23 @@
 package com.example.ManageMate.Models.User;
 
 import com.example.ManageMate.Models.User.Auth.UserRole;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -19,6 +25,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Builder
 public class User implements UserDetails {
 
@@ -45,6 +52,16 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private String phone;
+
+    @Column(name = "createdAt")
+    @CreatedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate createdAt;
+
+    @Column(name = "modifiedAt")
+    @LastModifiedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate modifiedAt;
 
     @ElementCollection
     @CollectionTable(name = "user_locations", joinColumns = @JoinColumn(name = "user_id"))

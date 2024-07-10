@@ -2,6 +2,7 @@ package com.example.ManageMate.Services.Implementation;
 
 import com.example.ManageMate.DTO.Response;
 import com.example.ManageMate.Exceptions.CustomError;
+import com.example.ManageMate.Exceptions.NotFound;
 import com.example.ManageMate.Models.User.Resume;
 import com.example.ManageMate.Repositories.ResumeFileRepository;
 import com.example.ManageMate.Services.ResumeService;
@@ -36,7 +37,7 @@ public class ResumeServiceImpl implements ResumeService {
     @Override
     public Resume getFile(Long id) {
         return fileRepository.findById(id).orElseThrow(
-                ()->new CustomError("File not Found","NOT_FOUND")
+                ()->new NotFound("File not Found","NOT_FOUND")
         );
     }
 }

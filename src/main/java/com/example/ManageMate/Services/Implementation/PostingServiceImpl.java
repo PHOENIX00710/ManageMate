@@ -7,7 +7,6 @@ import com.example.ManageMate.Exceptions.CustomError;
 import com.example.ManageMate.Models.Posting.Posting;
 import com.example.ManageMate.Repositories.PostingRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -30,12 +29,14 @@ public class PostingServiceImpl implements com.example.ManageMate.Services.Posti
     @Override
     public ResponseEntity<Response> postNewJob(PostingRequest postingRequest) {
         try{
+            System.out.println(postingRequest);
             Posting newJobPosting=modelMapper.map(postingRequest,Posting.class);
             postingRepository.save(newJobPosting);
             PostingResponse newPosting=modelMapper.map(newJobPosting,PostingResponse.class);
             return ResponseEntity.ok(new Response(true,"Successfully Posted!",newPosting));
         }
         catch (Exception e){
+            System.out.println(e);
             throw new CustomError("Error in Job Posting","JOB_POSTING_CODE");
         }
     }

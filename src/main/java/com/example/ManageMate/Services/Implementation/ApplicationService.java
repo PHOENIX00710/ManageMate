@@ -5,6 +5,7 @@ import com.example.ManageMate.DTO.Application.ApplicationResponse;
 import com.example.ManageMate.DTO.Profile.ProfileResponse;
 import com.example.ManageMate.DTO.Response;
 import com.example.ManageMate.Exceptions.CustomError;
+import com.example.ManageMate.Exceptions.NotFound;
 import com.example.ManageMate.Models.Application.Application;
 import com.example.ManageMate.Models.Posting.Posting;
 import com.example.ManageMate.Models.User.User;
@@ -43,13 +44,13 @@ public class ApplicationService implements com.example.ManageMate.Services.Appli
         // Check if the user exists
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            throw  new CustomError("User not found", "NOT_FOUND_404");
+            throw  new NotFound("User not found", "NOT_FOUND");
         }
 
         // Check if the posting exists
         Optional<Posting> postingOptional = postingRepository.findById(postId);
         if (postingOptional.isEmpty()) {
-            throw new CustomError("Posting not found","NOT_FOUND_404");
+            throw new NotFound("Posting not found","NOT_FOUND");
         }
 
         User currUser = userOptional.get();
@@ -84,7 +85,7 @@ public class ApplicationService implements com.example.ManageMate.Services.Appli
 
         List<Application> applications=applicationRepository.findAll();
         if(applications.isEmpty())
-            throw new CustomError("No applications available","RESOURCE_NOT_FOUND");
+            throw new NotFound("No applications available","RESOURCE_NOT_FOUND");
 
         List<ApplicationResponse> responses= new ArrayList<>();
 

@@ -2,6 +2,7 @@ package com.example.ManageMate.Services.Implementation;
 
 import com.example.ManageMate.DTO.Response;
 import com.example.ManageMate.Exceptions.CustomError;
+import com.example.ManageMate.Exceptions.NotFound;
 import com.example.ManageMate.Models.User.Image;
 import com.example.ManageMate.Repositories.ProfilePictureRepository;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class ProfilePictureImpl implements com.example.ManageMate.Services.Profi
     @Override
     public Image getPicture(Long id) {
         return profilePictureRepository.findById(id).orElseThrow(
-                ()->new CustomError("Photo not Found","NOT_FOUND")
+                ()->new NotFound("Photo not Found","NOT_FOUND")
         );
     }
 }

@@ -7,6 +7,8 @@ import com.example.ManageMate.DTO.User.AuthResponse;
 import com.example.ManageMate.DTO.User.LoginDetails;
 import com.example.ManageMate.DTO.User.RegisterUser;
 import com.example.ManageMate.Exceptions.CustomError;
+import com.example.ManageMate.Exceptions.FieldEmpty;
+import com.example.ManageMate.Exceptions.NotFound;
 import com.example.ManageMate.Models.User.Image;
 import com.example.ManageMate.Models.User.Resume;
 import com.example.ManageMate.Models.User.User;
@@ -17,6 +19,7 @@ import com.example.ManageMate.Services.ResumeService;
 import com.example.ManageMate.Services.UserServiceInterface;
 import com.example.ManageMate.auth.service.JwtService;
 import com.example.ManageMate.utils.UserToProfileResponse;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,6 +56,7 @@ public class UserService implements UserServiceInterface {
     }
 
     //Signup
+    @Transactional
     @Override
     public AuthResponse registerUser(RegisterUser registerUser){
 
@@ -74,6 +78,7 @@ public class UserService implements UserServiceInterface {
     }
 
     //Login
+    @Transactional
     @Override
     public AuthResponse loginUser(LoginDetails loginDetails){
 
@@ -115,17 +120,18 @@ public class UserService implements UserServiceInterface {
 
 
     @Override
+    @Transactional
     public Response updateProfile(ProfileRequest profileRequest, Long userId) throws IOException {
 
         if(profileRequest.getPhone() == null || profileRequest.getPhone().isEmpty()){
-            throw new CustomError("Phone Number field cannot be empty","INPUT_ERROR");
+            throw new FieldEmpty("Phone Number field cannot be empty","INPUT_ERROR");
         }
         if(profileRequest.getName() == null || profileRequest.getName().isEmpty()){
-            throw new CustomError("Name field cannot be empty","INPUT_ERROR");
+            throw new FieldEmpty("Name field cannot be empty","INPUT_ERROR");
         }
 
         User currUser=userRepository.findById(userId).orElseThrow(
-                ()->new CustomError("User Not Found","NOT_FOUND")
+                ()->new NotFound("User Not Found","NOT_FOUND")
         );
 
         currUser.setName(profileRequest.getName());
@@ -163,7 +169,7 @@ public class UserService implements UserServiceInterface {
     @Override
     public ProfileResponse getProfileById(Long Id) {
         User currUser=userRepository.findById(Id).orElseThrow(
-                ()->new CustomError("User Not Found","NOT_FOUND")
+                ()->new NotFound("User Not Found","NOT_FOUND")
         );
 
         return toProfileResponse.convertToProfile(currUser);

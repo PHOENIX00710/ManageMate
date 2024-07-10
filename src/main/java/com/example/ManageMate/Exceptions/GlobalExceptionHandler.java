@@ -13,8 +13,28 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse= new ErrorResponse(
                 customError.getErrorMessage(),
                 customError.getErrorCode(),
-                HttpStatus.BAD_GATEWAY
+                HttpStatus.INTERNAL_SERVER_ERROR
         );
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(NotFound.class)
+    public ResponseEntity<ErrorResponse> handleException(NotFound notFound){
+        ErrorResponse errorResponse= new ErrorResponse(
+                notFound.getErrorMessage(),
+                notFound.getErrorCode(),
+                HttpStatus.NOT_FOUND
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(FieldEmpty.class)
+    public ResponseEntity<ErrorResponse> handleException(FieldEmpty fieldEmpty){
+        ErrorResponse errorResponse= new ErrorResponse(
+                fieldEmpty.getErrorMessage(),
+                fieldEmpty.getErrorCode(),
+                HttpStatus.NO_CONTENT
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.NO_CONTENT);
     }
 }
