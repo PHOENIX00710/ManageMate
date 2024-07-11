@@ -25,6 +25,11 @@ public class PostingController {
         return postingService.getAllJobs();
     }
 
+    @GetMapping("/getRecommendations")
+    public ResponseEntity<List<PostingResponse>> getRecommendations(@PathVariable Long userId){
+        return postingService.getRecommendations(userId);
+    }
+
     @PostMapping("/create-new-job")
     public ResponseEntity<Response> createNewJob(@RequestBody PostingRequest posting){
         return postingService.postNewJob(posting);

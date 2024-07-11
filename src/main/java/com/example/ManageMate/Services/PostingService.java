@@ -10,5 +10,6 @@ import java.util.List;
 public interface PostingService {
     ResponseEntity<Response> postNewJob(PostingRequest postingRequest);
     ResponseEntity<List<PostingResponse>> getAllJobs();
+    ResponseEntity<List<PostingResponse>> getRecommendations(Long userId);
     void deletePost(Long postId);
 }
